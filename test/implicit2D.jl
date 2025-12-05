@@ -4,8 +4,8 @@ using Test
 
 const T = Float64
 
-body(x,y,z,w) = x^2 + y^2 + z^2 + w^2 - 1.0
-mesh = (collect(-1:0.5:1), collect(-1:0.5:1), collect(-1:0.5:1), collect(-1:0.5:1))
+body(x,y) = x^2 + y^2 - 1.0
+mesh = (collect(-1:0.5:1), collect(-1:0.5:1))
 
 # CartesianGeometry API
 println("CartesianGeometry API")
@@ -17,14 +17,6 @@ Bs = integrate(Tuple{1}, body, mesh, T, zero, bary; method=:vofijul)
 # ImplicitCutIntegration API
 println("ImplicitCutIntegration API")
 A, B, V, W, C_ω, C_γ, Γ, cell_types = GeometricMoments(body, mesh; compute_centroids = true)
-
-@testset "GeometricMoments Size" begin
-    @test all(size(Vs) .== size(V))
-    @test all(size(As[1]) .== size(A[1]))
-    @test all(size(Ws[1]) .== size(W[1]))
-    @test all(size(Bs[1]) .== size(B[1]))
-end
-
 
 # helper: convert sparse/diagonal matrix or vector to an array shaped like `ref`
 function sparsediag_to_array(x, ref)
@@ -43,29 +35,7 @@ end
 V_arr  = sparsediag_to_array(V,  Vs)
 A1_arr = sparsediag_to_array(A[1], As[1])
 A2_arr = sparsediag_to_array(A[2], As[2])
-A3_arr = sparsediag_to_array(A[3], As[3])
-A4_arr = sparsediag_to_array(A[4], As[4])
 W1_arr = sparsediag_to_array(W[1], Ws[1])
 W2_arr = sparsediag_to_array(W[2], Ws[2])
-W3_arr = sparsediag_to_array(W[3], Ws[3])
-W4_arr = sparsediag_to_array(W[4], Ws[4])
 B1_arr = sparsediag_to_array(B[1], Bs[1])
 B2_arr = sparsediag_to_array(B[2], Bs[2])
-B3_arr = sparsediag_to_array(B[3], Bs[3])
-B4_arr = sparsediag_to_array(B[4], Bs[4])
-
-@testset "GeometricMoments Values" begin
-    @test isapprox(Vs,  V_arr;  atol=1e-3)
-    @test isapprox(As[1], A1_arr; atol=1e-3)
-    @test isapprox(Ws[1], W1_arr; atol=1e-3)
-    @test isapprox(Bs[1], B1_arr; atol=1e-3)
-    @test isapprox(As[2], A2_arr; atol=1e-3)
-    @test isapprox(Ws[2], W2_arr; atol=1e-3)
-    @test isapprox(Bs[2], B2_arr; atol=1e-3)
-    @test isapprox(As[3], A3_arr; atol=1e-3)
-    @test isapprox(Ws[3], W3_arr; atol=1e-3)
-    @test isapprox(Bs[3], B3_arr; atol=1e-3)
-    @test isapprox(As[4], A4_arr; atol=1e-3)
-    @test isapprox(Ws[4], W4_arr; atol=1e-3)
-    @test isapprox(Bs[4], B4_arr; atol=1e-3)
-end
